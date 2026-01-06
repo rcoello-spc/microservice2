@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: microservice2
+  datasource:
+    url: jdbc:h2:mem:pruebaDB;
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+server:
+  port: 8092
+
+# URL del microservicio de clientes (configurable para Docker)
+microservice1:
+  url: http://localhost:8091
+resilience4j.retry:
+    instances:
+      backendA:
+        maxAttempts: 10
+        waitDuration: 2000
+resilience4j.circuitbreaker:
+    instances:
+      backendA:
+        registerHealthIndicator: true
+        slidingWindowSize: 100
