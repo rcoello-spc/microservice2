@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Microservicio de Clientes
+  microservice1:
+    build:
+      context: ./microservice1
+      dockerfile: Dockerfile
+    container_name: ms-clientes
+    ports:
+      - "8091:8091"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8091/clientes"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Microservicio de Cuentas y Movimientos
+  microservice2:
+    build:
+      context: ./microservice2
+      dockerfile: Dockerfile
+    container_name: ms-cuentas
+    ports:
+      - "8092:8092"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MICROSERVICE1_URL=http://microservice1:8091
+    depends_on:
+      - microservice1
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8092/cuentas"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  microservices-network:
+    driver: bridge
